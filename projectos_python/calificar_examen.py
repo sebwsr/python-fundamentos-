@@ -24,23 +24,24 @@ for p in preguntas:
 print("=== RESULTADOS ===")
 print(df_estudiantes[['Nombre', 'Puntuación']].to_string(index=False))
 
-print("\n=== ERRORES POR PREGUNTA (DETALLE POR ALUMNO) ===")
+print("\n=== DETALLE COMPLETO DE RESPUESTAS ===")
 
-# Crear un DataFrame que muestre las respuestas incorrectas
-df_errores = df_estudiantes.copy()
+# Crear copia del DataFrame para marcar errores
+df_detalle = df_estudiantes.copy()
 
-# Marcar con 'X' las respuestas incorrectas de cada alumno
+# Marcar respuestas incorrectas y mantener las correctas
 for p in preguntas:
-    df_errores[p] = df_errores[p].where(df_errores[p] == clave_respuestas[p], 'X')
+    df_detalle[p] = df_detalle[p].where(
+        df_detalle[p] == clave_respuestas[p], 
+        df_detalle[p] + '✗'  # Marca error con símbolo
+    )
 
-# Mostrar solo alumnos con al menos un error
-alumnos_con_errores = df_errores[df_errores[preguntas].eq('X').any(axis=1)]
+# Ordenar por puntuación (opcional)
+df_detalle = df_detalle.sort_values('Puntuación', ascending=False)
 
-if not alumnos_con_errores.empty:
-    print("Alumnos con respuestas incorrectas (X = error):")
-    print(alumnos_con_errores.to_string(index=False))
-else:
-    print("¡Todos los alumnos respondieron correctamente todas las preguntas!")
+# Mostrar tabla completa
+print("Leyenda: Respuesta✗ = Incorrecta")
+print(df_detalle.to_string(index=False))
 # 7. Guardar resultados en CSV
 df_estudiantes.to_csv("resultados_examen.csv", index=False)
 print("\nResultados guardados en 'resultados_examen.csv'")
